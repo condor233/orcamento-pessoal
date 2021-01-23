@@ -27,6 +27,19 @@ class Bd {
         if(id === null) {
             localStorage.setItem('id', 0)
         }
+    
+    }
+
+    recuperarTodosRegistros() {
+        let id = localStorage.getItem('id')
+        let despesas = []
+        for (let i = 1; i <= id; i++) {
+            let despesa = JSON.parse(localStorage.getItem(i))
+            if(localStorage.getItem(i)) {
+                despesas.push(despesa)
+            }
+        }
+        return despesas
     }
 
     getProximoId() {
@@ -61,14 +74,21 @@ function cadastrarDespesa() {
     )
 
     if(despesa.validarDados()) {
-       // bd.gravar(despesa)
-       document.getElementById('modal_titulo').innerHTML = 'Registro inserido com sucesso'
+        bd.gravar(despesa)
+
+        document.getElementById('modal_titulo').innerHTML = 'Registro inserido com sucesso'
 		document.getElementById('modal_titulo_div').className = 'modal-header text-success'
 		document.getElementById('modal_conteudo').innerHTML = 'Despesa foi cadastrada com sucesso!'
 		document.getElementById('modal_btn').innerHTML = 'Voltar'
 		document.getElementById('modal_btn').className = 'btn btn-success'
-
-		$('#modalRegistraDespesa').modal('show') 
+        $('#modalRegistraDespesa').modal('show') 
+        
+        ano.value = ''
+        mes.value = ''
+        dia.value = ''
+        tipo.value = ''
+        descricao.value = ''
+        valor.value = ''
     } else {
         document.getElementById('modal_titulo').innerHTML = 'Erro na inclusão do registro'
 		document.getElementById('modal_titulo_div').className = 'modal-header text-danger'
@@ -76,10 +96,36 @@ function cadastrarDespesa() {
 		document.getElementById('modal_btn').innerHTML = 'Voltar e corrigir'
 		document.getElementById('modal_btn').className = 'btn btn-danger'
         $('#modalRegistraDespesa').modal('show')
+    }  
+}
 
-    }
+function carregaListaDespesas() {
+    let despesas = bd.recuperarTodosRegistros()
 
-   
+    let listaDespesas = document.getElementById('listaDespesa')
+
+    despesas.forEach(e => {
+
+       let linha = listaDespesas.insertRow()
+
+       linha.insertCell(0).innerHTML = `${e.dia}/${e.mes}/${e.ano}`
+       switch(e.tipo) {
+           case '1': e.tipo = 'Alimentação'
+           break
+           case '2': e.tipo = 'Educação'
+           break
+           case '3': e.tipo = 'Lazer'
+           break
+           case '4': e.tipo = 'Saúde'
+           break
+           case '5': e.tipo = 'Transporte'
+           break
+       }
+       linha.insertCell(1).innerHTML = e.tipo
+       linha.insertCell(2).innerHTML = e.descricao
+       linha.insertCell(3).innerHTML = e.valor
+    })
+  
 }
 
 
