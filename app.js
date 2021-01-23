@@ -30,6 +30,19 @@ class Bd {
     
     }
 
+    pesquisar(despesa) {
+        let despesasFiltradas = this.recuperarTodosRegistros()
+
+        if(despesa.ano !== '') despesasFiltradas = despesasFiltradas.filter(d => d.ano === despesa.ano)
+        if(despesa.mes !== '') despesasFiltradas = despesasFiltradas.filter(d => d.mes === despesa.mes)
+        if(despesa.dia !== '') despesasFiltradas = despesasFiltradas.filter(d => d.dia === despesa.dia)
+        if(despesa.tipo !== '') despesasFiltradas = despesasFiltradas.filter(d => d.tipo === despesa.tipo)
+        if(despesa.descricao !== '') despesasFiltradas = despesasFiltradas.filter(d => d.descricao === despesa.descricao)
+        if(despesa.valor !== '') despesasFiltradas = despesasFiltradas.filter(d => d.valor === despesa.valor)
+
+        return despesasFiltradas
+    }
+
     recuperarTodosRegistros() {
         let id = localStorage.getItem('id')
         let despesas = []
@@ -99,33 +112,48 @@ function cadastrarDespesa() {
     }  
 }
 
-function carregaListaDespesas() {
-    let despesas = bd.recuperarTodosRegistros()
+function carregaListaDespesas( despesas = Array(), filtro = false) {
+    if(despesas.length === 0 && filtro === false) {
+        despesas = bd.recuperarTodosRegistros()
+    }
 
     let listaDespesas = document.getElementById('listaDespesa')
+    listaDespesas.innerHTML = ''
 
     despesas.forEach(e => {
 
        let linha = listaDespesas.insertRow()
 
        linha.insertCell(0).innerHTML = `${e.dia}/${e.mes}/${e.ano}`
-       switch(e.tipo) {
-           case '1': e.tipo = 'Alimentação'
-           break
-           case '2': e.tipo = 'Educação'
-           break
-           case '3': e.tipo = 'Lazer'
-           break
-           case '4': e.tipo = 'Saúde'
-           break
-           case '5': e.tipo = 'Transporte'
-           break
-       }
+
+       if(e.tipo === '1') e.tipo = 'Alimentação'
+       if(e.tipo === '2') e.tipo = 'Educação'
+       if(e.tipo === '3') e.tipo = 'Lazer'
+       if(e.tipo === '4') e.tipo = 'Saúde'
+       if(e.tipo === '5') e.tipo = 'Transporte'
+    
        linha.insertCell(1).innerHTML = e.tipo
        linha.insertCell(2).innerHTML = e.descricao
        linha.insertCell(3).innerHTML = e.valor
     })
   
+}
+
+function pesquisarDespesa() {
+    let ano =   document.getElementById('ano').value
+    let mes =  document.getElementById('mes').value
+    let dia =  document.getElementById('dia').value
+    let tipo =  document.getElementById('tipo').value
+    let descricao =  document.getElementById('descricao').value
+    let valor = document.getElementById('valor').value
+
+    let despesa = new Despesa(ano, mes, dia, tipo, descricao, valor)
+
+    despesasFiltradas = bd.pesquisar(despesa)
+
+    carregaListaDespesas(despesasFiltradas, true)
+
+    
 }
 
 
